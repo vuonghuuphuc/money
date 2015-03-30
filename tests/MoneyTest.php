@@ -8,20 +8,12 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace SebastianBergmann\Money;
 
 class MoneyTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers            \SebastianBergmann\Money\Money::__construct
-     * @uses              \SebastianBergmann\Money\Currency
-     * @expectedException \SebastianBergmann\Money\InvalidArgumentException
-     */
-    public function testExceptionIsRaisedForInvalidConstructorArguments()
-    {
-        new Money(null, new Currency('EUR'));
-    }
-
     /**
      * @covers            \SebastianBergmann\Money\Money::__construct
      * @covers            \SebastianBergmann\Money\Money::handleCurrencyArgument
@@ -31,16 +23,6 @@ class MoneyTest extends \PHPUnit_Framework_TestCase
     public function testExceptionIsRaisedForInvalidConstructorArguments2()
     {
         new Money(0, null);
-    }
-
-    /**
-     * @covers            \SebastianBergmann\Money\Money::fromString
-     * @uses              \SebastianBergmann\Money\Currency
-     * @expectedException \SebastianBergmann\Money\InvalidArgumentException
-     */
-    public function testExceptionIsRaisedForInvalidConstructorArguments3()
-    {
-        Money::fromString(1234, new Currency('EUR'));
     }
 
     /**
@@ -302,19 +284,6 @@ class MoneyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers            \SebastianBergmann\Money\Money::multiply
-     * @uses              \SebastianBergmann\Money\Money::__construct
-     * @uses              \SebastianBergmann\Money\Money::handleCurrencyArgument
-     * @uses              \SebastianBergmann\Money\Currency
-     * @expectedException \SebastianBergmann\Money\InvalidArgumentException
-     */
-    public function testExceptionIsRaisedWhenMultipliedUsingInvalidRoundingMode()
-    {
-        $a = new Money(1, new Currency('EUR'));
-        $a->multiply(2, null);
-    }
-
-    /**
      * @covers \SebastianBergmann\Money\Money::allocateToTargets
      * @covers \SebastianBergmann\Money\Money::newMoney
      * @uses   \SebastianBergmann\Money\Money::__construct
@@ -365,19 +334,6 @@ class MoneyTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(new Money(8264, new Currency('EUR')), $extract['subtotal']);
         $this->assertEquals(new Money(1736, new Currency('EUR')), $extract['percentage']);
-    }
-
-    /**
-     * @covers            \SebastianBergmann\Money\Money::allocateToTargets
-     * @uses              \SebastianBergmann\Money\Money::__construct
-     * @uses              \SebastianBergmann\Money\Money::handleCurrencyArgument
-     * @uses              \SebastianBergmann\Money\Currency
-     * @expectedException \SebastianBergmann\Money\InvalidArgumentException
-     */
-    public function testExceptionIsRaisedWhenTryingToAllocateToInvalidNumberOfTargets()
-    {
-        $a = new Money(0, new Currency('EUR'));
-        $a->allocateToTargets(null);
     }
 
     /**

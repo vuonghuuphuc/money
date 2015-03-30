@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace SebastianBergmann\Money;
 
 /**
@@ -1132,7 +1134,7 @@ class Currency
      * @param  string $currencyCode
      * @throws \SebastianBergmann\Money\InvalidArgumentException
      */
-    public function __construct($currencyCode)
+    public function __construct(string $currencyCode)
     {
         if (!isset(self::$currencies[$currencyCode])) {
             $currencyCode = strtoupper($currencyCode);
@@ -1150,11 +1152,11 @@ class Currency
     /**
      * @param string $code
      * @param string $displayName
-     * @param integer $numericCode
-     * @param integer $defaultFractionDigits
-     * @param integer $subUnit
+     * @param int $numericCode
+     * @param int $defaultFractionDigits
+     * @param int $subUnit
      */
-    public static function addCurrency($code, $displayName, $numericCode, $defaultFractionDigits, $subUnit)
+    public static function addCurrency(string $code, string $displayName, int $numericCode, int $defaultFractionDigits, int $subUnit)
     {
         self::$currencies[$code] = [
             'display_name' => $displayName,
@@ -1186,7 +1188,7 @@ class Currency
      * Returns the default number of fraction digits used with this
      * currency.
      *
-     * @return integer
+     * @return int
      */
     public function getDefaultFractionDigits()
     {
@@ -1206,7 +1208,7 @@ class Currency
     /**
      * Returns the ISO 4217 numeric code of this currency.
      *
-     * @return integer
+     * @return int
      */
     public function getNumericCode()
     {
@@ -1216,7 +1218,7 @@ class Currency
     /**
      * Returns the ISO 4217 numeric code of this currency.
      *
-     * @return integer
+     * @return int
      */
     public function getSubUnit()
     {

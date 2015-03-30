@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace SebastianBergmann\Money;
 
 /**
@@ -25,7 +27,7 @@ namespace SebastianBergmann\Money;
 class Money implements \JsonSerializable
 {
     /**
-     * @var integer
+     * @var int
      */
     private $amount;
 
@@ -35,7 +37,7 @@ class Money implements \JsonSerializable
     private $currency;
 
     /**
-     * @var integer[]
+     * @var int[]
      */
     private static $roundingModes = [
         PHP_ROUND_HALF_UP,
@@ -45,16 +47,12 @@ class Money implements \JsonSerializable
     ];
 
     /**
-     * @param  integer                                  $amount
+     * @param  int                                  $amount
      * @param  \SebastianBergmann\Money\Currency|string $currency
      * @throws \SebastianBergmann\Money\InvalidArgumentException
      */
-    public function __construct($amount, $currency)
+    public function __construct(int $amount, $currency)
     {
-        if (!is_int($amount)) {
-            throw new InvalidArgumentException('$amount must be an integer');
-        }
-
         $this->amount   = $amount;
         $this->currency = $this->handleCurrencyArgument($currency);
     }
@@ -74,12 +72,8 @@ class Money implements \JsonSerializable
      * @return static
      * @throws \SebastianBergmann\Money\InvalidArgumentException
      */
-    public static function fromString($value, $currency)
+    public static function fromString(string $value, $currency) : Money
     {
-        if (!is_string($value)) {
-            throw new InvalidArgumentException('$value must be a string');
-        }
-
         $currency = self::handleCurrencyArgument($currency);
 
         return new static(
@@ -102,10 +96,10 @@ class Money implements \JsonSerializable
     /**
      * Specify data which should be serialized to JSON
      *
-     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * @return array data which can be serialized by <b>json_encode</b>,
      * @link   http://php.net/manual/en/jsonserializable.jsonserialize.php
      */
-    public function jsonSerialize()
+    public function jsonSerialize() : array
     {
         return [
             'amount'   => $this->amount,
@@ -116,9 +110,10 @@ class Money implements \JsonSerializable
     /**
      * Returns the monetary value represented by this object.
      *
-     * @return integer
+     * @return int
      */
-    public function getAmount()
+
+    public function getAmount() : int
     {
         return $this->amount;
     }
@@ -128,7 +123,8 @@ class Money implements \JsonSerializable
      *
      * @return float
      */
-    public function getConvertedAmount()
+
+    public function getConvertedAmount() : float
     {
         return round($this->amount / $this->currency->getSubUnit(), $this->currency->getDefaultFractionDigits());
     }
@@ -139,7 +135,7 @@ class Money implements \JsonSerializable
      *
      * @return \SebastianBergmann\Money\Currency
      */
-    public function getCurrency()
+    public function getCurrency() : Currency
     {
         return $this->currency;
     }
@@ -153,7 +149,7 @@ class Money implements \JsonSerializable
      * @throws \SebastianBergmann\Money\CurrencyMismatchException
      * @throws \SebastianBergmann\Money\OverflowException
      */
-    public function add(Money $other)
+    public function add(Money $other) : Money
     {
         $this->assertSameCurrency($this, $other);
 
@@ -173,7 +169,7 @@ class Money implements \JsonSerializable
      * @throws \SebastianBergmann\Money\CurrencyMismatchException
      * @throws \SebastianBergmann\Money\OverflowException
      */
-    public function subtract(Money $other)
+    public function subtract(Money $other) : Money
     {
         $this->assertSameCurrency($this, $other);
 
@@ -190,7 +186,7 @@ class Money implements \JsonSerializable
      *
      * @return static
      */
-    public function negate()
+    public function negate() : Money
     {
         return $this->newMoney(-1 * $this->amount);
     }
@@ -199,19 +195,13 @@ class Money implements \JsonSerializable
      * Returns a new Money object that represents the monetary value
      * of this Money object multiplied by a given factor.
      *
-     * @param  float   $factor
-     * @param  integer $roundingMode
+     * @param  float $factor
+     * @param  int   $roundingMode
      * @return static
      * @throws \SebastianBergmann\Money\InvalidArgumentException
      */
-    public function multiply($factor, $roundingMode = PHP_ROUND_HALF_UP)
+    public function multiply(float $factor, int $roundingMode = PHP_ROUND_HALF_UP) : Money
     {
-        if (!in_array($roundingMode, self::$roundingModes)) {
-            throw new InvalidArgumentException(
-                '$roundingMode must be a valid rounding mode (PHP_ROUND_*)'
-            );
-        }
-
         return $this->newMoney(
             $this->castToInt(
                 round($factor * $this->amount, 0, $roundingMode)
@@ -223,16 +213,12 @@ class Money implements \JsonSerializable
      * Allocate the monetary value represented by this Money object
      * among N targets.
      *
-     * @param  integer $n
+     * @param  int $n
      * @return static[]
      * @throws \SebastianBergmann\Money\InvalidArgumentException
      */
-    public function allocateToTargets($n)
+    public function allocateToTargets(int $n) : array
     {
-        if (!is_int($n)) {
-            throw new InvalidArgumentException('$n must be an integer');
-        }
-
         $low       = $this->newMoney(intval($this->amount / $n));
         $high      = $this->newMoney($low->getAmount() + 1);
         $remainder = $this->amount % $n;
@@ -256,7 +242,7 @@ class Money implements \JsonSerializable
      * @param  array $ratios
      * @return static[]
      */
-    public function allocateByRatios(array $ratios)
+    public function allocateByRatios(array $ratios) : array
     {
         /** @var \SebastianBergmann\Money\Money[] $result */
         $result    = [];
@@ -288,11 +274,11 @@ class Money implements \JsonSerializable
      * represented by a Money object) instead.
      *
      * @param  float $percentage
-     * @param  integer $roundingMode
+     * @param  int   $roundingMode
      * @return static[]
      * @see    https://github.com/sebastianbergmann/money/issues/27
      */
-    public function extractPercentage($percentage, $roundingMode = PHP_ROUND_HALF_UP)
+    public function extractPercentage(float $percentage, $roundingMode = PHP_ROUND_HALF_UP) : array
     {
         $percentage = $this->newMoney(
             $this->castToInt(
@@ -314,10 +300,10 @@ class Money implements \JsonSerializable
      * less than, equal to, or greater than the other Money object.
      *
      * @param  \SebastianBergmann\Money\Money $other
-     * @return integer -1|0|1
+     * @return int -1|0|1
      * @throws \SebastianBergmann\Money\CurrencyMismatchException
      */
-    public function compareTo(Money $other)
+    public function compareTo(Money $other) : int
     {
         $this->assertSameCurrency($this, $other);
 
@@ -332,10 +318,10 @@ class Money implements \JsonSerializable
      * Returns TRUE if this Money object equals to another.
      *
      * @param  \SebastianBergmann\Money\Money $other
-     * @return boolean
+     * @return bool
      * @throws \SebastianBergmann\Money\CurrencyMismatchException
      */
-    public function equals(Money $other)
+    public function equals(Money $other) : bool
     {
         return $this->compareTo($other) == 0;
     }
@@ -345,10 +331,10 @@ class Money implements \JsonSerializable
      * is greater than that of another, FALSE otherwise.
      *
      * @param  \SebastianBergmann\Money\Money $other
-     * @return boolean
+     * @return bool
      * @throws \SebastianBergmann\Money\CurrencyMismatchException
      */
-    public function greaterThan(Money $other)
+    public function greaterThan(Money $other) : bool
     {
         return $this->compareTo($other) == 1;
     }
@@ -358,10 +344,10 @@ class Money implements \JsonSerializable
      * is greater than or equal that of another, FALSE otherwise.
      *
      * @param  \SebastianBergmann\Money\Money $other
-     * @return boolean
+     * @return bool
      * @throws \SebastianBergmann\Money\CurrencyMismatchException
      */
-    public function greaterThanOrEqual(Money $other)
+    public function greaterThanOrEqual(Money $other) : bool
     {
         return $this->greaterThan($other) || $this->equals($other);
     }
@@ -371,10 +357,10 @@ class Money implements \JsonSerializable
      * is smaller than that of another, FALSE otherwise.
      *
      * @param  \SebastianBergmann\Money\Money $other
-     * @return boolean
+     * @return bool
      * @throws \SebastianBergmann\Money\CurrencyMismatchException
      */
-    public function lessThan(Money $other)
+    public function lessThan(Money $other) : bool
     {
         return $this->compareTo($other) == -1;
     }
@@ -384,10 +370,10 @@ class Money implements \JsonSerializable
      * is smaller than or equal that of another, FALSE otherwise.
      *
      * @param  \SebastianBergmann\Money\Money $other
-     * @return boolean
+     * @return bool
      * @throws \SebastianBergmann\Money\CurrencyMismatchException
      */
-    public function lessThanOrEqual(Money $other)
+    public function lessThanOrEqual(Money $other) : bool
     {
         return $this->lessThan($other) || $this->equals($other);
     }
@@ -439,7 +425,7 @@ class Money implements \JsonSerializable
      * @return int
      * @throws \SebastianBergmann\Money\OverflowException
      */
-    private function castToInt($amount)
+    private function castToInt($amount) : int
     {
         $this->assertInsideIntegerBounds($amount);
 
@@ -447,10 +433,10 @@ class Money implements \JsonSerializable
     }
 
     /**
-     * @param  integer $amount
+     * @param  int $amount
      * @return static
      */
-    private function newMoney($amount)
+    private function newMoney($amount) : Money
     {
         return new static($amount, $this->currency);
     }
@@ -460,7 +446,7 @@ class Money implements \JsonSerializable
      * @return \SebastianBergmann\Money\Currency
      * @throws \SebastianBergmann\Money\InvalidArgumentException
      */
-    private static function handleCurrencyArgument($currency)
+    private static function handleCurrencyArgument($currency) : Currency
     {
         if (!$currency instanceof Currency && !is_string($currency)) {
             throw new InvalidArgumentException('$currency must be an object of type Currency or a string');

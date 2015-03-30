@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace SebastianBergmann\Money;
 
 use NumberFormatter;
@@ -32,7 +34,7 @@ class IntlFormatter implements Formatter
      * @param  string $locale
      * @return static
      */
-    public static function fromLocale($locale)
+    public static function fromLocale(string $locale)
     {
         return new static(
             new NumberFormatter(

@@ -8,19 +8,12 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace SebastianBergmann\Money;
 
 class CurrencyTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers            \SebastianBergmann\Money\Currency::__construct
-     * @expectedException \SebastianBergmann\Money\InvalidArgumentException
-     */
-    public function testExceptionIsRaisedForInvalidConstructorArgument()
-    {
-        new Currency(null);
-    }
-
     /**
      * @covers \SebastianBergmann\Money\Currency::__construct
      */
